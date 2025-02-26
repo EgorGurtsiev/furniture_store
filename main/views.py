@@ -3,7 +3,7 @@ from django.views import View
 from django.shortcuts import render
 
 
-def under_construction(request):
+def under_construction(request, *args, **kwargs):
     return render(request, 'main/503.html', status=503)
 
 
