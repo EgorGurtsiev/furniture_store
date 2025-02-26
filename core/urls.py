@@ -1,30 +1,21 @@
-"""
-URL configuration for core project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from tkinter.font import names
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import path
 
-from main.views import under_construction
+from main.views import index, under_construction
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('main.urls', namespace='main')),
-    path('cart/', under_construction),
-    path('goods/<slug:group_slug>/', under_construction),
-    path('goods/<slug:group_slug>/<slug:product_slug>', under_construction),
-    path('orders/', under_construction),
+    # Главная
+    path('', index, name='index'), 
+    path('aboutdelivery/', under_construction, name='about delivery'),
+    # Каталог
+    path('category/<slug:group_slug>/', under_construction, name='category'),
+    path('product/<slug:product_slug>', under_construction, name='product'),
+    # Заказы
+    path('orders/', under_construction, name='orders'),
+    # Корзина
+    path('cart/', under_construction, name='cart'),
+    path('cart/checkout', under_construction, name='gocheckout'),
 ]
