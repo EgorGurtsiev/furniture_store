@@ -1,75 +1,9 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Иконки Bootstrap -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
-    <style>
-        .card-img-top {
-            height: 200px;
-            object-fit: cover;
-        }
-        .jumbotron {
-            background: url('https://via.placeholder.com/1920x600') center/cover;
-            color: white;
-            padding: 4rem 2rem;
-            margin-bottom: 2rem;
-        }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
+{% load static %}
 
-<!-- Навигация -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand" href="#">NailFurni</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link active" href="#">Главная</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Каталог</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        Категории
-                    </a>
-                    <ul class="dropdown-menu">
-                        {% comment %} {% for category in catefories %}
-                        <li><a class="dropdown-item" href="{{category.geturl()}}">{{catefory.name}}</a></li>
-                        {% endfor %} {% endcomment %}
-                    </ul>
-                </li>
-            </ul>
-            <form class="d-flex">
-                <a href="#" class="btn btn-outline-light me-2">
-                    <i class="bi bi-cart"></i> Корзина
-                </a>
-            </form>
-        </div>
-    </div>
-</nav>
 
-<!-- Главный баннер -->
-<div class="jumbotron">
-    <div class="container text-center">
-        <h1 class="display-4">Новые поступления 2023</h1>
-        <p class="lead">Лучшие гаджеты по доступным ценам</p>
-        <a href="#" class="btn btn-primary btn-lg">Смотреть новинки</a>
-    </div>
-</div>
-
-<!-- Основной контент -->
-<main class="container mb-5">
-    <h2 class="mb-4">Популярные товары</h2>
+{% block content %}
+<h2 class="mb-4">Популярные товары</h2>
     
     <div class="row g-4">
         <!-- Карточка товара -->
@@ -92,42 +26,4 @@
         <!-- Повторить карточки товара -->
         <!-- Добавьте еще 5 аналогичных блоков для других товаров -->
     </div>
-</main>
-
-<!-- Футер -->
-<footer class="bg-dark text-white py-5">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4">
-                <h5>О магазине</h5>
-                <p>NailFurni - лучший выбор мебели и инструментов для маникюрных салонов. Работаем с 2010 года.</p>
-            </div>
-            <div class="col-md-4">
-                <h5>Контакты</h5>
-                <ul class="list-unstyled">
-                    <li><i class="bi bi-geo-alt"></i> Москва, ул. Примерная, 12</li>
-                    <li><i class="bi bi-phone"></i> +7 (495) 123-45-67</li>
-                    <li><i class="bi bi-envelope"></i> info@nailfurni .ru</li>
-                </ul>
-            </div>
-            <div class="col-md-4">
-                <h5>Мы в соцсетях</h5>
-                <div class="social-links">
-                    <a href="#" class="text-white me-2"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="text-white me-2"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="text-white me-2"><i class="bi bi-telegram"></i></a>
-                </div>
-            </div>
-        </div>
-        <div class="text-center mt-4 pt-4 border-top">
-            <small>© 2023 NailFurni. Все права защищены.</small>
-        </div>
-    </div>
-</footer>
-
-<!-- Bootstrap JS и зависимости -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
-
-</body>
-</html>
+{% endblock %}
