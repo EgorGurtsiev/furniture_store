@@ -5,6 +5,7 @@ from imagekit.models import ProcessedImageField
 from imagekit.processors import ResizeToFill
 from tree_queries.models import TreeNode
 from uuid import uuid4
+from eav.decorators import register_eav
 
 
 class ProductGroup(TreeNode):
@@ -36,6 +37,8 @@ class ProductGroup(TreeNode):
         verbose_name="Категория"
         verbose_name_plural="Категории"
 
+
+@register_eav()
 class Product(models.Model):
     slug=models.SlugField(max_length=255, unique=True, db_index=True)
     name=models.CharField(verbose_name="Название", max_length=255, db_index=True)
@@ -51,6 +54,7 @@ class Product(models.Model):
         
     def __str__(self):
         return self.name
+    
     
 class ProductImage(models.Model):
     product=models.ForeignKey(Product, on_delete=models.CASCADE, related_name="image")

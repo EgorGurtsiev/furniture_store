@@ -6,12 +6,13 @@
 <h2 class="mb-4">Популярные товары</h2>
     
     <div class="row g-4">
-        <!-- Карточка товара -->
+        <!-- Карточки товара -->
+        {% comment %} {% for product in products %} {% endcomment %}
         <div class="col-md-4">
-            <div class="card h-100">
+            <div class="card h-100" >
                 <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Товар">
                 <div class="card-body">
-                    <h5 class="card-title">Смартфон XYZ 2000</h5>
+                    <a href='#'><h5 class="card-title" href='#'>Смартфон XYZ 2000</h5></a>
                     <p class="card-text">Новый флагман с тройной камерой и процессором последнего поколения.</p>
                     <div class="d-flex justify-content-between align-items-center">
                         <span class="h4">$999</span>
@@ -22,8 +23,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Повторить карточки товара -->
-        <!-- Добавьте еще 5 аналогичных блоков для других товаров -->
+        {% comment %} {% endfor %} {% endcomment %}
     </div>
 {% endblock %}
