@@ -1,9 +1,9 @@
 from django.template import Library
 
-from goods.models import ProductGroup
+from goods.models import Category
 
 register = Library()
 
 @register.simple_tag
-def tag_product_group():
-    return ProductGroup.objects.all()
+def tag_category():
+    return Category.objects.all()

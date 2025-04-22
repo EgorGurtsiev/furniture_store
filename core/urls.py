@@ -10,7 +10,7 @@ urlpatterns = [
     path('', index, name='index'), 
     path('aboutdelivery/', under_construction, name='about delivery'),
     # Каталог
-    path('category/<slug:group_slug>/', under_construction, name='category'),
+    path('category/<slug:category_slug>/', ProductListView.as_view(), name='category'),
     path('product/<slug:product_slug>', under_construction, name='product'),
     # Заказы
     path('orders/', under_construction, name='orders'),

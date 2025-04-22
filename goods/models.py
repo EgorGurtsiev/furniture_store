@@ -8,7 +8,7 @@ from uuid import uuid4
 from eav.decorators import register_eav
 
 
-class ProductGroup(TreeNode):
+class Category(TreeNode):
     slug=models.SlugField(max_length=255, unique=True, null=False, db_index=True)
     name=models.CharField(verbose_name="Название", max_length=255, db_index=True)
     
@@ -16,22 +16,10 @@ class ProductGroup(TreeNode):
         return f"{slugify(self.name)}"
     
     def get_absolute_url(self):
-        return reverse("category", kwargs={"slug": self.slug})
-    
-    # def save(self, *args, created=False, **kwargs):
-    #     if created:
-    #         self.slug = self._get_new_slug()
-    #     else:
-    #         new_slug = self._get_new_slug()
-    #         if new_slug != self.slug:
-    #             self.slug = new_slug
-    #     super().save(*args, **kwargs)
+        return reverse('category', kwargs={'category_slug': self.slug})
         
     def __str__(self):
         return self.name
-    
-    def get_absolute_url(self):
-        return reverse('category', kwargs={'group_slug': self.slug})
     
     class Meta:
         verbose_name="Категория"
@@ -42,7 +30,7 @@ class ProductGroup(TreeNode):
 class Product(models.Model):
     slug=models.SlugField(max_length=255, unique=True, db_index=True)
     name=models.CharField(verbose_name="Название", max_length=255, db_index=True)
-    group=models.ForeignKey(ProductGroup, on_delete=models.PROTECT)
+    category=models.ForeignKey(Category, on_delete=models.PROTECT)
     
     def get_absolute_url(self):
         return reverse("product", kwargs={"product_slug": self.slug})
