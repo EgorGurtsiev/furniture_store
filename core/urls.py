@@ -1,7 +1,11 @@
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls.static import static
 
+from django.conf import settings
+from goods.views import ProductListView
 from main.views import index, under_construction
+from debug_toolbar.toolbar import debug_toolbar_urls
 
 
 urlpatterns = [
@@ -19,3 +23,7 @@ urlpatterns = [
     path('cart/checkout', under_construction, name='gocheckout'),
 ]  + debug_toolbar_urls()
 
+
+
+# if settings.DEBUG: # new
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

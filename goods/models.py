@@ -1,7 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
-from imagekit.models import ProcessedImageField
+from imagekit.models import ProcessedImageField, ImageSpecField
 from imagekit.processors import ResizeToFill
 from tree_queries.models import TreeNode
 from uuid import uuid4
@@ -47,17 +47,14 @@ class Product(models.Model):
 class ProductImage(models.Model):
     product=models.ForeignKey(Product, on_delete=models.CASCADE, related_name="image")
     original=models.ImageField(verbose_name="Изображение", upload_to='product/original')
-    thumbnail=ProcessedImageField(
-        verbose_name="Миниатюра",
-        upload_to='Миниатюра/thumbnail',
-        help_text="200x150px",
+    thumbnail=ImageSpecField(
+        source="original",
         processors=[ResizeToFill(200, 150)],
         format='JPEG',
         options={'quality': 80},
     )
-    medium=ProcessedImageField(
-        verbose_name="Средний размер",
-        upload_to='product/medium',
+    medium=ImageSpecField(
+        source="original",
         processors=[ResizeToFill(400, 300)], 
         help_text="400x300px",
         format='JPEG',
@@ -67,3 +64,7 @@ class ProductImage(models.Model):
     def __str__(self):
         return f"Изображение для {self.product.name}"
     
+    class Meta:
+        verbose_name="Изображение товар"
+        verbose_name_plural="Изображения товаров"
+
