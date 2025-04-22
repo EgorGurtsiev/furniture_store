@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.text import slugify
 from imagekit.models import ProcessedImageField, ImageSpecField
 from imagekit.processors import ResizeToFill
@@ -25,12 +26,23 @@ class Category(TreeNode):
         verbose_name="Категория"
         verbose_name_plural="Категории"
 
+class ProductQuerySet(models.QuerySet):
+    def by_category_slug(self, slug:str) -> models.QuerySet:
+        return self.filter(category__slug=slug)
+
+class ProductManager(models.Manager):
+    def get_queryset(self):
+        return ProductQuerySet(self.model, using=self._db)
 
 @register_eav()
 class Product(models.Model):
     slug=models.SlugField(max_length=255, unique=True, db_index=True)
     name=models.CharField(verbose_name="Название", max_length=255, db_index=True)
     category=models.ForeignKey(Category, on_delete=models.PROTECT)
+    description=models.CharField(max_length=1275, default='')
+    
+    # objects=ProductQuerySet.as_manager()
+    objects=ProductManager()
     
     def get_absolute_url(self):
         return reverse("product", kwargs={"product_slug": self.slug})
@@ -43,6 +55,10 @@ class Product(models.Model):
     def __str__(self):
         return self.name
     
+    class Meta:
+        verbose_name="Товар"
+        verbose_name_plural="Товары"
+        
     
 class ProductImage(models.Model):
     product=models.ForeignKey(Product, on_delete=models.CASCADE, related_name="image")
@@ -56,7 +72,6 @@ class ProductImage(models.Model):
     medium=ImageSpecField(
         source="original",
         processors=[ResizeToFill(400, 300)], 
-        help_text="400x300px",
         format='JPEG',
         options={'quality': 80},
     )
@@ -68,3 +83,27 @@ class ProductImage(models.Model):
         verbose_name="Изображение товар"
         verbose_name_plural="Изображения товаров"
 
+class PriceManager(models.Manager):
+    def get_current_price(self):
+        price_obj = self.order_by('-start_from').first()
+        if price_obj:
+            return f'{price_obj.price} руб.'
+        return '0 руб.'
+        
+class Price(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="prices")
+    price = models.DecimalField(verbose_name="Цена", max_digits=10, decimal_places=2)
+    start_from = models.DateTimeField("Начало действия", default=timezone.now)
+    
+    objects = PriceManager()
+    
+    def __str__(self):
+        return f"{self.price} руб. за {self.product}"
+    
+    class Meta:
+        verbose_name = "Цена"
+        verbose_name_plural = "Цены"
+        
+class Discount(models.Model):
+    pass   
+        
