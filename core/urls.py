@@ -17,4 +17,5 @@ urlpatterns = [
     # Корзина
     path('cart/', under_construction, name='cart'),
     path('cart/checkout', under_construction, name='gocheckout'),
-]
+]  + debug_toolbar_urls()
+
