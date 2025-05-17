@@ -1,12 +1,6 @@
-name: django
-x-django-common:
-  &django-common
-  env_file:
-    - .env
-
 services:
   db:
-    <<: *django-common
+    container_name: db
     image: postgres:17
     environment:
       POSTGRES_DB: ${DATABASE_NAME}
@@ -17,12 +11,15 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
  
-  django-web:
-    <<: *django-common
-    build: .
-    container_name: django-docker
-    ports:
-      - "8000:8000"
+  django:
+    container_name: django
+    build: 
+      context: .
+      args:
+        PROJECT_DIR: ${DJANGO_PROJECT_DIR}
+    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+    expose:
+      - 8000
     depends_on:
       - db
     environment:
@@ -36,7 +33,26 @@ services:
  
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DATABASE_HOST: ${DATABASE_HOST}
-      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_PORT: ${DATABASE_PORT}    
+    volumes:
+      - static_volume:${DJANGO_STATICFILES_DIR}
+      - media_volume:${DJANGO_MEDIA_DIR}
 
+  nginx:
+    container_name: nginx
+    image: nginx:alpine
+    volumes:
+      - static_volume:${DJANGO_STATICFILES_DIR}
+      - media_volume:${DJANGO_MEDIA_DIR}
+      - ./nginx.conf.template:/etc/nginx/templates/default.conf.template
+    ports:
+      - 80:80
+    depends_on:
+      - django
+    environment:
+      STATIC_DIR: ${DJANGO_STATICFILES_DIR}
+      MEDIA_DIR: ${DJANGO_MEDIA_DIR}
 volumes:
   postgres_data:
+  static_volume:
+  media_volume:

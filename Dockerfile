@@ -46,16 +46,13 @@ WORKDIR ${PROJECT_DIR}
  
 # Copy application code
 COPY --chown=${PROJECT_USER}:${PROJECT_GROUP} . ${PROJECT_DIR}
- 
+
 # Set environment variables to optimize Python
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1 
  
+RUN python manage.py migrate && \
+    python manage.py collectstatic
+
 # Switch to non-root user
 USER ${PROJECT_USER}
- 
-# Expose the application port
-EXPOSE 8000 
- 
-# Start the application using Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "core.wsgi:application"]
