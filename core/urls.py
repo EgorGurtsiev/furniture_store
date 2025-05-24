@@ -3,7 +3,7 @@ from django.urls import path
 from django.conf.urls.static import static
 
 from django.conf import settings
-from goods.views import ProductListView
+from goods.views import ProductDetailView, ProductListView
 from main.views import index, under_construction
 from debug_toolbar.toolbar import debug_toolbar_urls
 
@@ -15,7 +15,8 @@ urlpatterns = [
     path('aboutdelivery/', under_construction, name='about delivery'),
     # Каталог
     path('category/<slug:category_slug>/', ProductListView.as_view(), name='category'),
-    path('product/<slug:product_slug>', under_construction, name='product'),
+
+    path('product/<slug:slug>', ProductDetailView.as_view(), name='product'),
     # Заказы
     path('orders/', under_construction, name='orders'),
     # Корзина

@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+    <!-- Основной контент -->
+    <div class="container my-5">
+        <div class="row">
+            <!-- Галерея изображений -->
+
+
+            <div class="col-md-6">
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <img src="https://via.placeholder.com/600x400" class="img-fluid main-image" alt="Название товара" id="mainImage">
+                    </div>
+                </div>
+                <div class="row product-gallery">
+                    {% for image  in object.image.all %}
+                        <div class="col-3">
+                            <img src={{ image.thumbnail.url }} class="img-fluid {% if image.is_main %} main-image {% else %} mb-2 {% endif %}" alt="Изображение 1" onclick="changeImage(this)">
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Информация о товаре -->
+            <div class="col-md-6">
+                <h1 class="mb-3">{{ object.name }}</h1>
+                
+                <div class="d-flex align-items-center mb-3">
+                    <div class="me-3">
+                        <span class="text-warning">
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-half"></i>
+                        </span>
+                        <span class="text-muted ms-1">4.5 (24 отзыва)</span>
+                    </div>
+                    <span class="badge bg-success">В наличии</span>
+                </div>
+
+                <h3 class="text-primary mb-4">{{ object.prices.get_current_price }}</h3>
+                
+                <div class="mb-4">
+                    <h5>Описание</h5>
+                    <p>Подробное описание товара. Здесь можно разместить всю необходимую информацию о характеристиках, преимуществах и особенностях данного продукта. Описание может быть достаточно длинным и содержать маркированные списки.</p>
+                    <ul>
+                        <li>Характеристика 1: Значение</li>
+                        <li>Характеристика 2: Значение</li>
+                        <li>Характеристика 3: Значение</li>
+                        <li>Характеристика 4: Значение</li>
+                    </ul>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label for="quantity" class="form-label">Количество</label>
+                        <div class="input-group">
+                            <button class="btn btn-outline-secondary" type="button" id="decrement">-</button>
+                            <input type="number" class="form-control text-center" value="1" min="1" id="quantity">
+                            <button class="btn btn-outline-secondary" type="button" id="increment">+</button>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="color" class="form-label">Цвет</label>
+                        <select class="form-select" id="color">
+                            <option selected>Выберите цвет</option>
+                            <option value="black">Чёрный</option>
+                            <option value="white">Белый</option>
+                            <option value="red">Красный</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex">
+                    <button class="btn btn-primary btn-lg me-md-2">
+                        <i class="bi bi-cart-plus"></i> Добавить в корзину
+                    </button>
+                    <button class="btn btn-outline-secondary btn-lg">
+                        <i class="bi bi-heart"></i> В избранное
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Дополнительные вкладки -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <ul class="nav nav-tabs" id="productTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab">Описание</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="specs-tab" data-bs-toggle="tab" data-bs-target="#specs" type="button" role="tab">Характеристики</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Отзывы</button>
+                    </li>
+                </ul>
+                <div class="tab-content p-3 border border-top-0 rounded-bottom" id="productTabsContent">
+                    <div class="tab-pane fade show active" id="description" role="tabpanel">
+                        <h4>Подробное описание товара</h4>
+                        <p>Здесь можно разместить полное описание товара с деталями, преимуществами, инструкцией по использованию и другой полезной информацией для покупателя.</p>
+                        <p>Можно добавить несколько абзацев, изображения, таблицы или видео для лучшего представления товара.</p>
+                    </div>
+                    <div class="tab-pane fade" id="specs" role="tabpanel">
+                        <h4>Технические характеристики</h4>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <th scope="row">Вес</th>
+                                    <td>0.5 кг</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Размеры</th>
+                                    <td>20 × 15 × 5 см</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Материал</th>
+                                    <td>Пластик, металл</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Цвет</th>
+                                    <td>Чёрный, белый, красный</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade" id="reviews" role="tabpanel">
+                        <h4>Отзывы покупателей</h4>
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <h5>Иван Петров</h5>
+                                <span class="text-warning">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star"></i>
+                                </span>
+                            </div>
+                            <p>Хороший товар, соответствует описанию. Доставка быстрая. Рекомендую!</p>
+                            <small class="text-muted">Опубликовано: 15.05.2023</small>
+                        </div>
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <h5>Анна Сидорова</h5>
+                                <span class="text-warning">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-half"></i>
+                                </span>
+                            </div>
+                            <p>Отличное качество, но цвет немного отличается от того, что на фото.</p>
+                            <small class="text-muted">Опубликовано: 10.05.2023</small>
+                        </div>
+                        <button class="btn btn-primary">Оставить отзыв</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Похожие товары -->
+        <div class="row mt-5">
+            <h3 class="mb-4">Похожие товары</h3>
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="card h-100">
+                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Похожий товар 1">
+                    <div class="card-body">
+                        <h5 class="card-title">Похожий товар 1</h5>
+                        <p class="card-text text-primary">2 199 ₽</p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <button class="btn btn-sm btn-outline-primary">В корзину</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="card h-100">
+                    <img src="https://via.placeholder.com/300x200/cccccc" class="card-img-top" alt="Похожий товар 2">
+                    <div class="card-body">
+                        <h5 class="card-title">Похожий товар 2</h5>
+                        <p class="card-text text-primary">1 899 ₽</p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <button class="btn btn-sm btn-outline-primary">В корзину</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="card h-100">
+                    <img src="https://via.placeholder.com/300x200/999999" class="card-img-top" alt="Похожий товар 3">
+                    <div class="card-body">
+                        <h5 class="card-title">Похожий товар 3</h5>
+                        <p class="card-text text-primary">2 799 ₽</p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <button class="btn btn-sm btn-outline-primary">В корзину</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="card h-100">
+                    <img src="https://via.placeholder.com/300x200/666666" class="card-img-top" alt="Похожий товар 4">
+                    <div class="card-body">
+                        <h5 class="card-title">Похожий товар 4</h5>
+                        <p class="card-text text-primary">2 399 ₽</p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <button class="btn btn-sm btn-outline-primary">В корзину</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
