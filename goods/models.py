@@ -1,4 +1,6 @@
+from datetime import datetime
 from django.db import models
+from django.db.models import Prefetch
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
@@ -7,6 +9,7 @@ from imagekit.processors import ResizeToFill
 from tree_queries.models import TreeNode
 from uuid import uuid4
 from eav.decorators import register_eav
+from eav.registry import EavConfig
 
 
 class Category(TreeNode):
@@ -26,26 +29,64 @@ class Category(TreeNode):
         verbose_name="Категория"
         verbose_name_plural="Категории"
 
+
 class ProductQuerySet(models.QuerySet):
-    def by_category_slug(self, slug:str) -> models.QuerySet:
+    def with_main_image(self):
+        return self.prefetch_related(
+            Prefetch('images', ProductImage.objects.main())
+        )
+    
+    def with_current_price(self):
+        return self.prefetch_related(
+            Prefetch('prices', Price.objects.current().only('product', 'price'))
+        )
+    
+    def in_category(self, slug:str) -> models.QuerySet:
+        """Фильтрация товаров по категории
+
+        Args:
+            slug (str): slug категории искомых товаров
+
+        Returns:
+            models.QuerySet: Товары в указанной категории
+        """
         return self.filter(category__slug=slug)
+
 
 class ProductManager(models.Manager):
     def get_queryset(self):
         return ProductQuerySet(self.model, using=self._db)
+    
+    def with_current_price(self):
+        return self.get_queryset().with_current_price()
+    
+    def in_category(self, slug:str) -> models.QuerySet:
+        """Фильтрация товаров по категории
 
-@register_eav()
+        Args:
+            slug (str): slug категории искомых товаров
+
+        Returns:
+            models.QuerySet: Товары в указанной категории
+        """
+        return self.get_queryset().in_category(slug=slug)
+
+
+class ProductEavConfig(EavConfig):
+    manager_attr = 'eav_objects'
+
+
+@register_eav(config_cls=ProductEavConfig)
 class Product(models.Model):
     slug=models.SlugField(max_length=255, unique=True, db_index=True)
     name=models.CharField(verbose_name="Название", max_length=255, db_index=True)
-    category=models.ForeignKey(Category, on_delete=models.PROTECT)
+    category=models.ForeignKey(Category, on_delete=models.PROTECT, related_name='products')
     description=models.CharField(max_length=1275, default='')
     
-    # objects=ProductQuerySet.as_manager()
     objects=ProductManager()
     
     def get_absolute_url(self):
-        return reverse("product", kwargs={"product_slug": self.slug})
+        return reverse("product", kwargs={"slug": self.slug})
     
     def save(self, *args, **kwargs):
        if not self.slug:
