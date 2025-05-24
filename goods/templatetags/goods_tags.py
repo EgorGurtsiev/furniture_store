@@ -1,5 +1,4 @@
 from django.template import Library
-
 from goods.models import Category
 
 register = Library()
