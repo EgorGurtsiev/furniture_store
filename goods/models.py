@@ -83,17 +83,30 @@ class ProductImage(models.Model):
         verbose_name="Изображение товар"
         verbose_name_plural="Изображения товаров"
 
-class PriceManager(models.Manager):
+
+class PriceQuerySet(models.QuerySet):
     def get_current_price(self):
-        price_obj = self.order_by('-start_from').first()
-        if price_obj:
-            return f'{price_obj.price} руб.'
-        return '0 руб.'
+        now = timezone.now()
+        return self.filter(
+            valid_from__lte=now, 
+            valid_to__gte=now
+        ).order_by('product', '-valid_from')
+
+
+class PriceManager(models.Manager):
+    def get_queryset(self) -> PriceQuerySet:
+        return PriceQuerySet(model=self.model, using=self._db)
         
+    def current(self):
+        """ Отдает текущую цену """
+        return self.get_queryset().get_current_price()
+
+    
 class Price(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="prices")
     price = models.DecimalField(verbose_name="Цена", max_digits=10, decimal_places=2)
-    start_from = models.DateTimeField("Начало действия", default=timezone.now)
+    valid_from = models.DateTimeField("Начало действия", default=timezone.now)
+    valid_to = models.DateTimeField("Начало действия", default=datetime.max)
     
     objects = PriceManager()
     
