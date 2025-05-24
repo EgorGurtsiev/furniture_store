@@ -24,7 +24,7 @@ class ProductAdmin(admin.ModelAdmin):
 @admin.register(ProductImage)
 class ProductImageAdmin(admin.ModelAdmin):
     list_display = ('product', 'get_thumbnail',)
-    list_filter = ('product',)
+    list_filter = ('product', 'is_main')
     
     def get_thumbnail(self, obj):
         return mark_safe(f'<img src={obj.thumbnail.url} high="30" width="40">')
@@ -33,5 +33,5 @@ class ProductImageAdmin(admin.ModelAdmin):
     
 @admin.register(Price)
 class PriceAdmin(admin.ModelAdmin):
-    list_display = ('price', 'product', 'start_from',)
+    list_display = ('price', 'product', 'valid_from', 'valid_to')
     list_filter = ('product',)
