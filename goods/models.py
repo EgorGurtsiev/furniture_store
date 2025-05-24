@@ -58,10 +58,15 @@ class Product(models.Model):
     class Meta:
         verbose_name="Товар"
         verbose_name_plural="Товары"
-        
+       
+       
+class ProductImageManager(models.Manager):
+    def main(self):
+        return self.get_queryset().filter(is_main=True) 
+
     
 class ProductImage(models.Model):
-    product=models.ForeignKey(Product, on_delete=models.CASCADE, related_name="image")
+    product=models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
     original=models.ImageField(verbose_name="Изображение", upload_to='product/original')
     thumbnail=ImageSpecField(
         source="original",
@@ -75,6 +80,9 @@ class ProductImage(models.Model):
         format='JPEG',
         options={'quality': 80},
     )
+    is_main = models.BooleanField(verbose_name="Главное изображение", default=False)
+    
+    objects = ProductImageManager()
     
     def __str__(self):
         return f"Изображение для {self.product.name}"
