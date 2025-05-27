@@ -39,14 +39,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
+    # Приложения сторонних пакетов 
     'imagekit',
     'eav',
     'debug_toolbar',
+    'rest_framework',
     
+    # Приложения проекта
     'main',
     'goods',
     'carts',
     'orders',
+    # 'accounts',
 ]
 
 MIDDLEWARE = [
@@ -65,7 +69,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        "DIRS": [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -154,3 +158,5 @@ EAV2_PRIMARY_KEY_FIELD = "django.db.models.BigAutoField"
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+FIXTURE_DIRS = [BASE_DIR / "fixtures"]
