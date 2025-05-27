@@ -1,6 +1,11 @@
 from datetime import datetime
+from decimal import Decimal
+from typing import Union
+
 from django.db import models
-from django.db.models import Prefetch
+from django.db.models import Prefetch, F
+from django.db.models.expressions import Window
+from django.db.models.functions import RowNumber
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
@@ -25,7 +30,7 @@ class Category(TreeNode):
     def __str__(self):
         return self.name
     
-    class Meta:
+    class Meta: # type: ignore
         verbose_name="Категория"
         verbose_name_plural="Категории"
 
@@ -33,12 +38,12 @@ class Category(TreeNode):
 class ProductQuerySet(models.QuerySet):
     def with_main_image(self):
         return self.prefetch_related(
-            Prefetch('images', ProductImage.objects.main())
+            Prefetch('images', ProductImage.objects.get_only_main()) # type: ignore
         )
     
     def with_current_price(self):
         return self.prefetch_related(
-            Prefetch('prices', Price.objects.current().only('product', 'price'))
+            Prefetch('prices', Price.objects.get_current_prices()) # type: ignore
         )
     
     def in_category(self, slug:str) -> models.QuerySet:
@@ -57,6 +62,9 @@ class ProductManager(models.Manager):
     def get_queryset(self):
         return ProductQuerySet(self.model, using=self._db)
     
+    def with_main_image(self):
+        return self.get_queryset().with_main_image()
+        
     def with_current_price(self):
         return self.get_queryset().with_current_price()
     
@@ -99,10 +107,20 @@ class Product(models.Model):
     class Meta:
         verbose_name="Товар"
         verbose_name_plural="Товары"
-       
+    
+    @property   
+    def price(self) -> 'Price':
+        """Отдает текущую цену товара"""
+        return self.prices.get_current_price() # type: ignore
+     
+    @property   
+    def main_image(self) -> 'ProductImage':
+        """Отдает текущую цену товара"""
+        return self.images.get_only_main().get() # type: ignore      
+    
        
 class ProductImageManager(models.Manager):
-    def main(self):
+    def get_only_main(self):
         return self.get_queryset().filter(is_main=True) 
 
     
@@ -126,7 +144,7 @@ class ProductImage(models.Model):
     objects = ProductImageManager()
     
     def __str__(self):
-        return f"Изображение для {self.product.name}"
+        return f"Изображение для {self.product}"
     
     class Meta:
         verbose_name="Изображение товар"
@@ -134,22 +152,34 @@ class ProductImage(models.Model):
 
 
 class PriceQuerySet(models.QuerySet):
-    def get_current_price(self):
+    def get_current_prices(self) -> models.QuerySet:
         now = timezone.now()
         return self.filter(
             valid_from__lte=now, 
-            valid_to__gte=now
-        ).order_by('product', '-valid_from')
-
+            valid_to__gte=now,
+        ).annotate(
+            rn=Window(
+                expression=RowNumber(), 
+                partition_by=[F('product'),], 
+                order_by=[F('valid_from').asc(),],
+            )
+        ).filter(rn=1)
+        
 
 class PriceManager(models.Manager):
     def get_queryset(self) -> PriceQuerySet:
         return PriceQuerySet(model=self.model, using=self._db)
-        
-    def current(self):
-        """ Отдает текущую цену """
-        return self.get_queryset().get_current_price()
-
+    
+    def get_current_prices(self) -> models.QuerySet:
+        return self.get_queryset().get_current_prices()
+            
+    def get_current_price(self) -> Union['Price', None]:
+        """ Отдает последнюю текущею цену или None если нет цен для товара """
+        now = timezone.now()
+        return self.get_queryset().filter(
+            valid_from__lte=now, 
+            valid_to__gte=now,
+        ).order_by('-valid_from').first()
     
 class Price(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="prices")
@@ -166,6 +196,6 @@ class Price(models.Model):
         verbose_name = "Цена"
         verbose_name_plural = "Цены"
         
-class Discount(models.Model):
-    pass   
-        
+# class Discount(models.Model):
+#     pass   
+       

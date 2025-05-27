@@ -10,7 +10,7 @@ class ProductListView(ListView):
     context_object_name = "products"
     
     def get_queryset(self):
-        return Product.objects.in_category(
+        return Product.objects.in_category( # type: ignore
             slug=self.kwargs.get('category_slug')
         ).with_current_price().with_main_image()
     
@@ -18,3 +18,9 @@ class ProductListView(ListView):
 class ProductDetailView(DetailView):
     model = Product
     template_name = "goods/product_detail.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["products"] = self.model.objects.all().order_by('?')[:5]
+        return context
+    

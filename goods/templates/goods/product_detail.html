@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load price_filter %}
 
 {% block content %}
 
@@ -7,20 +8,53 @@
     <div class="container my-5">
         <div class="row">
             <!-- Галерея изображений -->
-
-
             <div class="col-md-6">
+                <!-- Основное изображение товара (превью) -->
                 <div class="row mb-3">
                     <div class="col-12">
-                        <img src="https://via.placeholder.com/600x400" class="img-fluid main-image" alt="Название товара" id="mainImage">
+                        <img  id="mainImage" src={{ object.main_image.original.url }} alt="Изображение товара" class="img-fluid rounded product-thumbnail" data-bs-toggle="modal" data-bs-target="#productImageModal" onclick="showImage(this.src, 'Название товара')">
                     </div>
                 </div>
-                <div class="row product-gallery">
-                    {% for image  in object.image.all %}
-                        <div class="col-3">
-                            <img src={{ image.thumbnail.url }} class="img-fluid {% if image.is_main %} main-image {% else %} mb-2 {% endif %}" alt="Изображение 1" onclick="changeImage(this)">
+                <!-- Галерея миниатюр -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="thumbnail-container">
+                            {% for image  in object.images.all %}
+                            <img src={{ image.thumbnail.url }} alt="Миниатюра 1" class="thumbnail-img {% if image.is_main %}active{% endif %}" onclick="showImage('{{ image.original.url }}', 'Название товара')">
+                            {% endfor %}
                         </div>
-                    {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Модальное окно для просмотра изображения -->
+            <div class="modal fade" id="productImageModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="imageModalTitle">Название товара</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img id="modalImage" src="" alt="Увеличенное изображение товара" class="img-fluid modal-image">
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                <i class="bi bi-x-lg"></i> Закрыть
+                            </button>
+                            <div>
+                                <button type="button" class="btn btn-outline-primary" onclick="rotateImage(-90)">
+                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" onclick="rotateImage(90)">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
+                                <button type="button" class="btn btn-primary">
+                                    <i class="bi bi-cart"></i> Добавить в корзину
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -42,7 +76,7 @@
                     <span class="badge bg-success">В наличии</span>
                 </div>
 
-                <h3 class="text-primary mb-4">{{ object.prices.get_current_price }}</h3>
+                <h3 class="text-primary mb-4">{{ object.price.price | price_format }}</h3>
                 
                 <div class="mb-4">
                     <h5>Описание</h5>
@@ -168,54 +202,94 @@
         <!-- Похожие товары -->
         <div class="row mt-5">
             <h3 class="mb-4">Похожие товары</h3>
+            {% for product in products %}
             <div class="col-md-3 col-sm-6 mb-4">
                 <div class="card h-100">
-                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Похожий товар 1">
+                    <img src={{ product.main_image.thumbnail.url }} class="card-img-top" alt="Похожий товар 1">
                     <div class="card-body">
-                        <h5 class="card-title">Похожий товар 1</h5>
-                        <p class="card-text text-primary">2 199 ₽</p>
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text text-primary">{{ product.price.price | price_format }}</p>
                     </div>
                     <div class="card-footer bg-transparent">
                         <button class="btn btn-sm btn-outline-primary">В корзину</button>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 col-sm-6 mb-4">
-                <div class="card h-100">
-                    <img src="https://via.placeholder.com/300x200/cccccc" class="card-img-top" alt="Похожий товар 2">
-                    <div class="card-body">
-                        <h5 class="card-title">Похожий товар 2</h5>
-                        <p class="card-text text-primary">1 899 ₽</p>
-                    </div>
-                    <div class="card-footer bg-transparent">
-                        <button class="btn btn-sm btn-outline-primary">В корзину</button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6 mb-4">
-                <div class="card h-100">
-                    <img src="https://via.placeholder.com/300x200/999999" class="card-img-top" alt="Похожий товар 3">
-                    <div class="card-body">
-                        <h5 class="card-title">Похожий товар 3</h5>
-                        <p class="card-text text-primary">2 799 ₽</p>
-                    </div>
-                    <div class="card-footer bg-transparent">
-                        <button class="btn btn-sm btn-outline-primary">В корзину</button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6 mb-4">
-                <div class="card h-100">
-                    <img src="https://via.placeholder.com/300x200/666666" class="card-img-top" alt="Похожий товар 4">
-                    <div class="card-body">
-                        <h5 class="card-title">Похожий товар 4</h5>
-                        <p class="card-text text-primary">2 399 ₽</p>
-                    </div>
-                    <div class="card-footer bg-transparent">
-                        <button class="btn btn-sm btn-outline-primary">В корзину</button>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
 {% endblock content %}
+
+{% block extra_css %}
+<style>
+    .product-thumbnail {
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    .product-thumbnail:hover {
+        transform: scale(1.03);
+    }
+    .modal-image {
+        max-height: 70vh;
+        object-fit: contain;
+    }
+    .thumbnail-container {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+    .thumbnail-img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        cursor: pointer;
+        border: 2px solid transparent;
+        border-radius: 4px;
+    }
+    .thumbnail-img.active {
+        border-color: #0d6efd;
+    }
+</style>
+{% endblock %}
+
+
+{% block javascript  %}
+<script>
+    // Показываем изображение в модальном окне
+    function showImage(src, title) {
+        document.getElementById('modalImage').src = src;
+        document.getElementById('imageModalTitle').textContent = title;
+        
+        // Сбрасываем поворот при загрузке нового изображения
+        document.getElementById('modalImage').style.transform = 'rotate(0deg)';
+        currentRotation = 0;
+        
+        // Обновляем активную миниатюру
+        document.getElementById('mainImage').src = src;
+        const thumbnails = document.querySelectorAll('.thumbnail-img');
+        thumbnails.forEach(thumb => {
+            thumb.classList.remove('active');
+            if (thumb.src === src) {
+                thumb.classList.add('active');
+            }
+        });
+    }
+    
+    // Поворачиваем изображение
+    let currentRotation = 0;
+    function rotateImage(degrees) {
+        currentRotation += degrees;
+        document.getElementById('modalImage').style.transform = `rotate(${currentRotation}deg)`;
+    }
+
+    // Инициализация - показываем первое изображение при загрузке
+    document.addEventListener('DOMContentLoaded', function() {
+        const mainImage = document.querySelector('.product-thumbnail');
+        if (mainImage) {
+            showImage(mainImage.src, '{{ product.name|escapejs }}');
+        }
+    });
+</script>
+{% endblock %}
