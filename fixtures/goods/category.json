@@ -1,0 +1,29 @@
+[
+{
+  "model": "goods.category",
+  "pk": 1,
+  "fields": {
+    "parent": null,
+    "slug": "stoly",
+    "name": "Столы"
+  }
+},
+{
+  "model": "goods.category",
+  "pk": 3,
+  "fields": {
+    "parent": null,
+    "slug": "kresla",
+    "name": "Стулья" 
+  }
+},
+{
+  "model": "goods.category",
+  "pk": 4,
+  "fields": {
+    "parent": null,
+    "slug": "hranenie",
+    "name": "Системы хранения"
+  }
+}
+]

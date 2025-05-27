@@ -4,5 +4,5 @@ venv
 .db
 .vscode
 /staticfiles/
-/media/
+/media/CACHE
 __pycache__/
