@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+{% load price_filter %}
+
+{% block content %}
+<div class="container mt-5">
+        <h1 class="mb-4">Ваша корзина</h1>
+        
+        {% if cart_items %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Товар</th>
+                            <th scope="col">Количество</th>
+                            <th scope="col">Цена за шт.</th>
+                            <th scope="col">Общая цена</th>
+                            <th scope="col">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart_items %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if item.product.images %}
+                                        <img src="{{ item.product.images.first.thumbnail.url }}" alt="{{ item.product.name }}" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
+                                    {% else %}
+                                        <img src="{% static 'images/no-image.png' %}" alt="No image" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
+                                    {% endif %}
+                                    <div class="ms-3">
+                                        <h5 class="mb-0">{{ item.product.name }}</h5>
+                                        {% comment %} <p class="text-muted mb-0">{{ item.product.short_description }}</p> {% endcomment %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <form method="post" action="" class="d-flex">
+                                {% comment %} <form method="post" action="{% url 'update_cart' item.id %}" class="d-flex"> {% endcomment %}
+                                    {% csrf_token %}
+                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control" style="width: 70px;">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary ms-2">Обновить</button>
+                                </form>
+                            </td>
+                            <td>{{ item.product.price.price | price_format }}</td>
+                            <td>{{ item.total_price | price_format }}</td>
+                            <td>
+                                {% comment %} <a href="{% url 'cart:remove_from_cart' item.id %}" class="btn btn-sm btn-outline-danger">Удалить</a> {% endcomment %}
+                                <a href="" class="btn btn-sm btn-outline-danger">Удалить</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Итого</h5>
+                            <p class="card-text">
+                                <strong>Товаров:</strong> {{ total_quantity }}<br>
+                                <strong>Общая стоимость:</strong> {{ cart_items.total_price | price_format }}
+                            </p>
+                            <a href="{% url 'index' %}" class="btn btn-outline-secondary">Продолжить покупки</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a href="" class="btn btn-primary btn-lg">Оформить заказ</a>
+                    {% comment %} <a href="{% url 'orders:checkout' %}" class="btn btn-primary btn-lg">Оформить заказ</a> {% endcomment %}
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                Ваша корзина пуста. <a href="{% url 'index' %}" class="alert-link">Начать покупки</a>
+            </div>
+        {% endif %}
+            <div class="row mt-5"></div>
+            <div class="row mt-5"></div>
+            <div class="row mt-5"></div>
+            <div class="row mt-5"></div>
+            <div class="row mt-5"></div>
+            <div class="row mt-5"></div>
+            <div class="row mt-5"></div>
+    </div>
+{% endblock content %}
