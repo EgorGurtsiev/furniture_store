@@ -22,5 +22,3 @@ jobs:
             git pull
             docker compose down -v
             docker compose up -d --build
-            sleep 10
-            docker exec -it django python manage.py migrate
