@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 
 from carts.factories import CartItemFactory
 from carts.models import Cart
-from goods.factories import ProductFactory, ProductImageFactory
+from goods.factories import PriceFactory, ProductFactory, ProductImageFactory
 from goods.models import Category
 from goods.data import IMAGES
 
@@ -32,7 +32,7 @@ def create_data(apps, schema_editor):
         count_product_in_cart = 2
         cat_images = IMAGES[cat.name]
         for product in products:
-            # PriceFactory.create_batch(4, product=product)
+            PriceFactory.create_batch(4, product=product)
             if count_product_in_cart:
                 CartItemFactory(cart=cart, product=product, quantity=1)
                 count_product_in_cart -= 1
