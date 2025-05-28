@@ -36,11 +36,10 @@ def create_data(apps, schema_editor):
             if count_product_in_cart:
                 CartItemFactory(cart=cart, product=product, quantity=1)
                 count_product_in_cart -= 1
-            i = True
-            for img in cat_images[random.randint(1,len(cat_images))-1]:
-                if i:
+            index_main_image = random.randint(1,len(cat_images))-1
+            for i, img in enumerate(cat_images[random.randint(1,len(cat_images))-1]):
+                if i == index_main_image:
                     ProductImageFactory(original=img, product=product, is_main=True)
-                    i = False
                     continue
                 ProductImageFactory(original=img, product=product)
     
