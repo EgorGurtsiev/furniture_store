@@ -32,10 +32,13 @@ class CartItem(models.Model):
     
     @property
     def total_price(self):
-        return self.quantity * self.product.price.price
-        
+        price = self.product.price
+        if not price:
+            return None
+        return self.quantity * price.price         
+    
     def __str__(self) -> str:
-        return f"{quantity} x {product.name} в корзине пользователя {self.cart.user}"
+        return f"{self.quantity} x {self.product.name} в корзине пользователя {self.cart.user}"
     
     class Мета:
         verbose_name = 'Товар в корзине'
