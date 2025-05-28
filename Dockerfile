@@ -51,9 +51,7 @@ COPY --chown=${PROJECT_USER}:${PROJECT_GROUP} . ${PROJECT_DIR}
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1 
  
-RUN python manage.py makemigrations --noinput && \
-    python manage.py migrate && \
-    python manage.py collectstatic
+RUN python manage.py collectstatic
 
 # Switch to non-root user
 USER ${PROJECT_USER}
