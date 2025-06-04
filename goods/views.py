@@ -21,6 +21,7 @@ class ProductDetailView(DetailView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["products"] = self.model.objects.all().order_by('?')[:5]
+        context["products"] = self.model.objects.get_related_products(self.kwargs.get('pk'), 4
+                                                                      ).with_current_price().with_main_image()
         return context
     

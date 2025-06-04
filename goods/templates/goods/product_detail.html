@@ -205,10 +205,10 @@
             {% for product in products %}
             <div class="col-md-3 col-sm-6 mb-4">
                 <div class="card h-100">
-                    <img src={{ product.main_image.thumbnail.url }} class="card-img-top" alt="Похожий товар 1">
+                    <img src={{ product.pf_main_image.0.thumbnail.url }} class="card-img-top" alt="Похожий товар 1">
                     <div class="card-body">
                         <h5 class="card-title">{{ product.name }}</h5>
-                        <p class="card-text text-primary">{{ product.price.price | price_format }}</p>
+                        <p class="card-text text-primary">{{ product.pf_current_price.0.price | price_format }}</p>
                     </div>
                     <div class="card-footer bg-transparent">
                         <button class="btn btn-sm btn-outline-primary">В корзину</button>

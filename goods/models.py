@@ -38,12 +38,12 @@ class Category(TreeNode):
 class ProductQuerySet(models.QuerySet):
     def with_main_image(self):
         return self.prefetch_related(
-            Prefetch('images', ProductImage.objects.get_only_main()) # type: ignore
+            Prefetch('images', ProductImage.objects.get_only_main(), to_attr='pf_main_image') # type: ignore
         )
     
     def with_current_price(self):
         return self.prefetch_related(
-            Prefetch('prices', Price.objects.get_current_prices()) # type: ignore
+            Prefetch('prices', Price.objects.get_current_prices(), to_attr='pf_current_price') # type: ignore
         )
     
     def in_category(self, slug:str) -> models.QuerySet:
@@ -68,7 +68,7 @@ class ProductManager(models.Manager):
     def with_current_price(self):
         return self.get_queryset().with_current_price()
     
-    def in_category(self, slug:str) -> models.QuerySet:
+    def in_category(self, slug:str) -> models.QuerySet['Product']:
         """Фильтрация товаров по категории
 
         Args:
@@ -79,6 +79,26 @@ class ProductManager(models.Manager):
         """
         return self.get_queryset().in_category(slug=slug)
 
+    def get_related_products(self, product_slug:str|None=None, product_pk:str|None=None, amount=4) -> models.QuerySet['Product']:
+        """Связанные продукты. В текущей реализации отдает случайные продукты за исключением product_pk
+
+        Args:
+            product_slug (str | None, optional): _description_. Defaults to None.
+            product_pk (str | None, optional): pk товара для которого ищем похожие
+            amount (int, optional): количество возвращаемых товаров. По умолчанию 4.
+
+        Returns:
+            models.QuerySet: 
+        """
+        filter = self.get_queryset()
+        if product_pk:
+            filter = filter.exclude(pk=product_pk)
+        elif product_slug:
+            filter = filter.exclude(pk=product_slug)
+        else:
+            ValueError("Необходимо передать один из параметров product_slug или product_pk")
+        
+        return filter.order_by('?')[:amount]
 
 class ProductEavConfig(EavConfig):
     manager_attr = 'eav_objects'
@@ -117,11 +137,17 @@ class Product(models.Model):
     def main_image(self) -> 'ProductImage':
         """Отдает текущую цену товара"""
         return self.images.get_only_main().get() # type: ignore      
-    
+
+class ProductImageQuerySet(models.QuerySet):
+    def get_only_main(self):
+        return self.filter(is_main=True) 
        
 class ProductImageManager(models.Manager):
+    def get_queryset(self) -> ProductImageQuerySet:
+        return ProductImageQuerySet(self.model, using=self._db)
+    
     def get_only_main(self):
-        return self.get_queryset().filter(is_main=True) 
+        return self.get_queryset().get_only_main()
 
     
 class ProductImage(models.Model):
@@ -180,6 +206,7 @@ class PriceManager(models.Manager):
             valid_from__lte=now, 
             valid_to__gte=now,
         ).order_by('-valid_from').first()
+   
     
 class Price(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="prices")
